@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>RCTouchBell - Suono Manuale</title>
+  <title>RCTouchBell - Manuale</title>
   <style>
     body {
       font-family: Georgia, serif;
@@ -76,6 +76,23 @@
       content: "🔔";
     }
 
+    .registra {
+      display: block;
+      margin: 0 auto;
+      margin-top: 30px;
+      padding: 10px 30px;
+      font-size: 16px;
+      background-color: #0078d7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .registra:hover {
+      background-color: #005fa3;
+    }
+
     .barra-inferiore {
       display: flex;
       justify-content: space-around;
@@ -98,11 +115,70 @@
       color: white;
     }
 
-    .registra {
-      display: block;
+    .hidden {
+      display: none;
+    }
+
+    .evento, .suonata {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 15px;
+    }
+
+    .azioni {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .azioni button {
+      padding: 6px 12px;
+      font-size: 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .azioni button.rinomina {
+      background-color: #0078d7;
+      color: white;
+    }
+
+    .azioni button.elimina {
+      background-color: #d9534f;
+      color: white;
+    }
+
+    .form-section {
+      max-width: 400px;
       margin: 0 auto;
-      margin-top: 30px;
-      padding: 10px 30px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    select, input[type="number"], input[type="time"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    .salva, .aggiungi {
+      margin-top: 25px;
+      width: 100%;
+      padding: 10px;
       font-size: 16px;
       background-color: #0078d7;
       color: white;
@@ -111,8 +187,14 @@
       cursor: pointer;
     }
 
-    .registra:hover {
+    .salva:hover, .aggiungi:hover {
       background-color: #005fa3;
+    }
+
+    .configurazione {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 16px;
     }
   </style>
 </head>
@@ -124,58 +206,137 @@
     <div class="data" id="data">--/--/----</div>
   </header>
 
-  <div class="sezione">
-    <h2>Campane a Distesa</h2>
-    <div class="icone" id="distesa">
-      <div class="campana" data-num="1"></div>
-      <div class="campana" data-num="2"></div>
-      <div class="campana" data-num="3"></div>
-      <div class="campana" data-num="4"></div>
-      <div class="campana" data-num="5"></div>
-      <div class="campana" data-num="6"></div>
-      <div class="campana" data-num="7"></div>
-      <div class="campana" data-num="8"></div>
+  <!-- Sezione: Suono Manuale -->
+  <div id="sezione-manuale">
+    <div class="sezione">
+      <h2>Campane a Distesa</h2>
+      <div class="icone" id="distesa">
+        <div class="campana" data-num="1"></div>
+        <div class="campana" data-num="2"></div>
+        <div class="campana" data-num="3"></div>
+        <div class="campana" data-num="4"></div>
+        <div class="campana" data-num="5"></div>
+        <div class="campana" data-num="6"></div>
+        <div class="campana" data-num="7"></div>
+        <div class="campana" data-num="8"></div>
+      </div>
     </div>
+
+    <div class="sezione">
+      <h2>Campane a Concerto</h2>
+      <div class="icone" id="concerto">
+        <div class="campana-verde" data-num="1"></div>
+        <div class="campana-verde" data-num="2"></div>
+        <div class="campana-verde" data-num="3"></div>
+        <div class="campana-verde" data-num="4"></div>
+        <div class="campana-verde" data-num="5"></div>
+        <div class="campana-verde" data-num="6"></div>
+        <div class="campana-verde" data-num="7"></div>
+        <div class="campana-verde" data-num="8"></div>
+      </div>
+    </div>
+
+    <div class="sezione">
+      <h2>Martelli</h2>
+      <div class="icone" id="martelli">
+        <div class="martello" data-num="1"></div>
+        <div class="martello" data-num="2"></div>
+        <div class="martello" data-num="3"></div>
+        <div class="martello" data-num="4"></div>
+        <div class="martello" data-num="5"></div>
+        <div class="martello" data-num="6"></div>
+        <div class="martello" data-num="7"></div>
+        <div class="martello" data-num="8"></div>
+      </div>
+    </div>
+
+    <button class="registra">REGISTRA</button>
+  </div><!-- Sezione: Elenco Suoni -->
+  <div id="sezione-elenco" class="hidden">
+    <h2>Elenco Suonate Registrate</h2>
+    <div id="elenco-suoni"></div>
   </div>
 
-  <div class="sezione">
-    <h2>Campane a Concerto</h2>
-    <div class="icone" id="concerto">
-      <div class="campana-verde" data-num="1"></div>
-      <div class="campana-verde" data-num="2"></div>
-      <div class="campana-verde" data-num="3"></div>
-      <div class="campana-verde" data-num="4"></div>
-      <div class="campana-verde" data-num="5"></div>
-      <div class="campana-verde" data-num="6"></div>
-      <div class="campana-verde" data-num="7"></div>
-      <div class="campana-verde" data-num="8"></div>
+  <!-- Sezione: Programmazione -->
+  <div id="sezione-programmazione" class="hidden">
+    <h2>Programmazione Suonate</h2>
+    <div class="form-section">
+      <label for="giorno">Giorno della settimana</label>
+      <select id="giorno">
+        <option value="Lunedì">Lunedì</option>
+        <option value="Martedì">Martedì</option>
+        <option value="Mercoledì">Mercoledì</option>
+        <option value="Giovedì">Giovedì</option>
+        <option value="Venerdì">Venerdì</option>
+        <option value="Sabato">Sabato</option>
+        <option value="Domenica">Domenica</option>
+      </select>
+
+      <label for="ora">Ora</label>
+      <input type="time" id="ora">
+
+      <label for="tipo">Tipo di suonata</label>
+      <select id="tipo">
+        <option value="distesa">Campana a Distesa</option>
+        <option value="concerto">Campana a Concerto</option>
+        <option value="martello">Martello</option>
+      </select>
+
+      <label for="campanaProg">Campana</label>
+      <select id="campanaProg">
+        <option value="1">Campana 1</option>
+        <option value="2">Campana 2</option>
+        <option value="3">Campana 3</option>
+        <option value="4">Campana 4</option>
+        <option value="5">Campana 5</option>
+        <option value="6">Campana 6</option>
+        <option value="7">Campana 7</option>
+        <option value="8">Campana 8</option>
+      </select>
+
+      <button class="aggiungi">AGGIUNGI PROGRAMMAZIONE</button>
     </div>
+    <div id="elenco-eventi"></div>
   </div>
 
-  <div class="sezione">
-    <h2>Martelli</h2>
-    <div class="icone" id="martelli">
-      <div class="martello" data-num="1"></div>
-      <div class="martello" data-num="2"></div>
-      <div class="martello" data-num="3"></div>
-      <div class="martello" data-num="4"></div>
-      <div class="martello" data-num="5"></div>
-      <div class="martello" data-num="6"></div>
-      <div class="martello" data-num="7"></div>
-      <div class="martello" data-num="8"></div>
+  <!-- Sezione: Battito Ore -->
+  <div id="sezione-battito" class="hidden">
+    <h2>Impostazioni Battito Ore</h2>
+    <div class="form-section">
+      <label for="campanaBattito">Campana da usare</label>
+      <select id="campanaBattito">
+        <option value="1">Campana 1</option>
+        <option value="2">Campana 2</option>
+        <option value="3">Campana 3</option>
+        <option value="4">Campana 4</option>
+        <option value="5">Campana 5</option>
+        <option value="6">Campana 6</option>
+        <option value="7">Campana 7</option>
+        <option value="8">Campana 8</option>
+      </select>
+
+      <label for="oraInizio">Escludi dalle ore</label>
+      <input type="number" id="oraInizio" min="0" max="23" placeholder="es. 22">
+
+      <label for="oraFine">Alle ore</label>
+      <input type="number" id="oraFine" min="0" max="23" placeholder="es. 7">
+
+      <button class="salva">SALVA IMPOSTAZIONI</button>
     </div>
+    <div class="configurazione" id="configurazione"></div>
   </div>
 
-  <button class="registra">REGISTRA</button>
-
+  <!-- Barra di navigazione -->
   <div class="barra-inferiore">
-    <button onclick="location.href='elenco.html'">ELENCO SUONI</button>
-    <button class="active" onclick="location.href='manuale.html'">SUONO MANUALE</button>
-    <button onclick="location.href='programmazione.html'">PROGRAMMAZIONE</button>
-    <button onclick="location.href='battito.html'">BATTITO ORE</button>
+    <button onclick="mostraSezione('elenco')">ELENCO SUONI</button>
+    <button onclick="mostraSezione('manuale')" class="active">SUONO MANUALE</button>
+    <button onclick="mostraSezione('programmazione')">PROGRAMMAZIONE</button>
+    <button onclick="mostraSezione('battito')">BATTITO ORE</button>
   </div>
 
+  <!-- Script -->
   <script>
+    // Orologio
     function aggiornaOrologio() {
       const ora = new Date();
       const hh = String(ora.getHours()).padStart(2, '0');
@@ -192,6 +353,24 @@
     setInterval(aggiornaOrologio, 1000);
     aggiornaOrologio();
 
+    // Navigazione interna
+    function mostraSezione(nome) {
+      document.getElementById('sezione-manuale').classList.add('hidden');
+      document.getElementById('sezione-elenco').classList.add('hidden');
+      document.getElementById('sezione-programmazione').classList.add('hidden');
+      document.getElementById('sezione-battito').classList.add('hidden');
+
+      document.getElementById(`sezione-${nome}`).classList.remove('hidden');
+
+      document.querySelectorAll('.barra-inferiore button').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`.barra-inferiore button[onclick*="${nome}"]`).classList.add('active');
+
+      if (nome === 'elenco') renderElenco();
+      if (nome === 'programmazione') renderEventi();
+      if (nome === 'battito') mostraConfigurazione();
+    }
+
+    // Suono manuale
     let suonataCorrente = [];
 
     function registraClick(tipo, numero, elemento) {
@@ -250,5 +429,26 @@
         setTimeout(() => {
           let selettore = '';
           if (passaggio.tipo === 'distesa') selettore = '.campana';
-          else if (passaggio.tipo === 'concerto') sele
+          else if (passaggio.tipo === 'concerto') selettore = '.campana-verde';
+          else if (passaggio.tipo === 'martello') selettore = '.martello';
+
+          const icone = document.querySelectorAll(selettore);
+          const icona = Array.from(icone).find(el => el.dataset.num == passaggio.numero);
+          if (icona) {
+            icona.style.backgroundColor = '#ff6666';
+            setTimeout(() => {
+              icona.style.backgroundColor = '';
+            }, 300);
+          }
+        }, delay);
+        delay += 500;
+      });
+    }
+
+    // Elenco suoni
+    function renderElenco() {
+      const container = document.getElementById('elenco-suoni');
+      const su
+
+
 
