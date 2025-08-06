@@ -5,83 +5,257 @@
   <title>Simulatore Campane</title>
   <style>
     body {
-      font-family: sans-serif;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #222;
+      color: #fff;
+    }
+    header {
       text-align: center;
-      background-color: #f0f0f0;
+      padding: 20px;
+      background-color: #333;
     }
-    h1 {
-      margin-top: 40px;
+    #ora {
+      font-size: 36px;
     }
-    .keypad, .campane {
-      margin: 20px auto;
+    #data {
+      font-size: 20px;
+      margin-top: 5px;
+    }
+    #main {
       display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
+      justify-content: space-between;
+      padding: 20px;
     }
-    button {
-      padding: 15px 25px;
-      font-size: 18px;
-      cursor: pointer;
+    #eventi {
+      width: 40%;
+    }
+    #eventi h2 {
+      margin-bottom: 10px;
+    }
+    #listaEventi {
+      background-color: #444;
+      padding: 10px;
+      border-radius: 8px;
+      max-height: 300px;
+      overflow-y: auto;
     }
     #accesso {
+      width: 50%;
+      text-align: right;
+    }
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 60px);
+      gap: 10px;
+      justify-content: right;
+      margin-top: 20px;
+    }
+    .keypad button {
+      font-size: 20px;
+      padding: 15px;
+      background-color: #0a84ff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #codiceDisplay {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    #contenuto {
+      display: none;
+      padding: 20px;
+    }
+    .sezione {
+      margin-top: 30px;
+    }
+    .suoniRapidi {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+    }
+    .suono {
+      background-color: #555;
+      padding: 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      position: relative;
+      text-align: center;
+    }
+    .suono.playing {
+      background-color: #4caf50;
+    }
+    .suono::after {
+      content: attr(data-status);
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      font-size: 14px;
+      color: #fff;
+    }
+    #inEsecuzione {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+    .barra {
+      display: flex;
+      gap: 20px;
+      margin-top: 40px;
+    }
+    .barra button {
+      background-color: #666;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .campaneManuali {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .campana {
+      width: 60px;
+      height: 80px;
+      background-color: #888;
+      border-radius: 10px;
+    }
+    .campana.attiva {
+      background-color: gold;
+    }
+    .tastiManuali {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .tastiManuali button {
+      padding: 10px 15px;
+      font-size: 16px;
+      border-radius: 6px;
+      background-color: #0a84ff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    #modalitaManuale {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    #registra {
       margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>🔔 Simulatore Campane</h1>
+  <header>
+    <div id="ora">--:--:--</div>
+    <div id="data">-- -- ----</div>
+  </header>
 
-  <div id="accesso">
-    <p>Inserisci il codice di accesso:</p>
-    <div class="keypad">
-      <input type="password" id="codice" maxlength="4" style="font-size: 20px; padding: 10px;">
-      <button onclick="verificaCodice()">Accedi</button>
+  <div id="main">
+    <div id="eventi">
+      <h2>PROSSIMI EVENTI</h2>
+      <div id="listaEventi">
+        <p>18:00 - Distesa Rosario P1</p>
+        <p>20:00 - Ave Maria di Fatima P2</p>
+        <p>21:30 - Campane Allegre P1</p>
+      </div>
     </div>
-    <p id="errore" style="color: red;"></p>
+
+    <div id="accesso">
+      <div id="codiceDisplay">Codice: <span id="codiceInserito"></span></div>
+      <div class="keypad">
+        <button onclick="digita('1')">1</button>
+        <button onclick="digita('2')">2</button>
+        <button onclick="digita('3')">3</button>
+        <button onclick="digita('4')">4</button>
+        <button onclick="digita('5')">5</button>
+        <button onclick="digita('6')">6</button>
+        <button onclick="digita('7')">7</button>
+        <button onclick="digita('8')">8</button>
+        <button onclick="digita('9')">9</button>
+        <button onclick="cancella()">C</button>
+        <button onclick="digita('0')">0</button>
+        <button onclick="verificaCodice()">OK</button>
+      </div>
+    </div>
   </div>
 
-  <div id="simulatore" style="display: none;">
-    <h2>Modalità Concerto</h2>
-    <div class="campane" id="campane"></div>
+  <div id="contenuto">
+    <div class="sezione">
+      <h2>SUONI RAPIDI</h2>
+      <div class="suoniRapidi" id="suoniRapidi"></div>
+      <div id="inEsecuzione"></div>
+    </div>
+
+    <div class="barra">
+      <button onclick="apriManuale()">✋ SUONO MANUALE</button>
+      <button>🎵 ELENCO SUONI</button>
+      <button>🕰️ SUONO ORE</button>
+    </div>
+
+    <div class="sezione" id="manuale" style="display:none;">
+      <h2>SUONO MANUALE</h2>
+      <div id="modalitaManuale">
+        <button onclick="setModalita('concerto')">Concerto</button>
+        <button onclick="setModalita('distesa')">Distesa</button>
+        <button onclick="setModalita('martelli')">Martelli</button>
+      </div>
+      <div class="campaneManuali" id="campaneManuali"></div>
+      <div class="tastiManuali" id="tastiManuali"></div>
+      <button id="registra">REGISTRA</button>
+    </div>
   </div>
 
   <script>
-    const codiceCorretto = "1111";
-    const campane = [
-      "campana1.mp3",
-      "campana2.mp3",
-      "campana3.mp3",
-      "campana4.mp3",
-      "campana5.mp3",
-      "campana6.mp3",
-      "campana7.mp3",
-      "campana8.mp3"
-    ];
+    let codice = "";
+    let suonataAttiva = null;
+    let modalita = null;
 
-    function verificaCodice() {
-      const input = document.getElementById("codice").value;
-      if (input === codiceCorretto) {
-        document.getElementById("accesso").style.display = "none";
-        document.getElementById("simulatore").style.display = "block";
-        caricaCampane();
-      } else {
-        document.getElementById("errore").textContent = "Codice errato. Riprova.";
+    function aggiornaOra() {
+      const now = new Date();
+      document.getElementById("ora").textContent = now.toLocaleTimeString();
+      document.getElementById("data").textContent = now.toLocaleDateString("it-IT", { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    setInterval(aggiornaOra, 1000);
+    aggiornaOra();
+
+    function digita(n) {
+      if (codice.length < 4) {
+        codice += n;
+        document.getElementById("codiceInserito").textContent = codice;
       }
     }
 
-    function caricaCampane() {
-      const container = document.getElementById("campane");
-      campane.forEach((file, index) => {
-        const btn = document.createElement("button");
-        btn.textContent = `Campana ${index + 1}`;
-        btn.onclick = () => {
-          const audio = new Audio(`audio/concerto/${file}`);
-          audio.play();
-        };
-        container.appendChild(btn);
-      });
+    function cancella() {
+      codice = "";
+      document.getElementById("codiceInserito").textContent = "";
     }
-  </script>
-</body>
-</html>
+
+    function verificaCodice() {
+      if (codice === "1111") {
+        document.getElementById("main").style.display = "none";
+        document.getElementById("contenuto").style.display = "block";
+        caricaSuoniRapidi();
+        caricaManuale();
+      } else {
+        alert("Codice errato");
+        cancella();
+      }
+    }
+
+    function caricaSuoniRapidi() {
+      const nomi = [
+        "Ave Maria di Lourdes", "Distesa Rosario", "Campane Allegre",
+        "Messa Feriale", "Angelus", "Funerale", "Battesimo", "Vespri"
+      ];
+      const container = document.getElementById("suoniRapidi");
+      nomi.forEach((nome, index) => {
+        const div = document.create
