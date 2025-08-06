@@ -2,144 +2,253 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Simulatore Campane</title>
+  <title>RCTouchBell - Suono Manuale</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
-      color: #333;
-      text-align: center;
-      padding: 40px;
-    }
-
-    h1 {
-      margin-bottom: 30px;
-    }
-
-    .selettore-modalita button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      border: none;
-      border-radius: 5px;
-      background-color: #007BFF;
-      color: white;
-    }
-
-    .selettore-modalita button:hover {
-      background-color: #0056b3;
-    }
-
-    .modalita {
-      display: none;
-      margin-top: 30px;
-    }
-
-    .campana {
-      margin: 10px;
-    }
-
-    .campana button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .campana button:hover {
-      background-color: #45a049;
-    }
-
-    #importa {
-      margin-top: 50px;
+      font-family: Georgia, serif;
+      background-color: #f2f2f2;
+      margin: 0;
       padding: 20px;
-      background-color: #fff;
-      border: 2px dashed #ccc;
-      border-radius: 10px;
+      color: #333;
     }
 
-    #fileInput {
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .orario {
+      font-size: 36px;
       margin-top: 10px;
+    }
+
+    .data {
+      font-size: 18px;
+      margin-top: 5px;
+    }
+
+    .sezione {
+      margin: 30px 0;
+    }
+
+    .sezione h2 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .icone {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .campana, .campana-verde, .martello {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      background-color: white;
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .campana-verde {
+      background-color: #c6f0c6;
+    }
+
+    .martello::before {
+      content: "🔨";
+    }
+
+    .campana::before,
+    .campana-verde::before {
+      content: "🔔";
+    }
+
+    .barra-inferiore {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #ccc;
+    }
+
+    .barra-inferiore button {
+      background-color: #e0e0e0;
+      border: none;
+      padding: 10px 20px;
+      font-size: 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .barra-inferiore button.active {
+      background-color: #0078d7;
+      color: white;
+    }
+
+    .registra {
+      display: block;
+      margin: 0 auto;
+      margin-top: 30px;
+      padding: 10px 30px;
+      font-size: 16px;
+      background-color: #0078d7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .registra:hover {
+      background-color: #005fa3;
     }
   </style>
 </head>
 <body>
-  <h1>Simulatore di Campane</h1>
 
-  <div class="selettore-modalita">
-    <button onclick="mostraModalita('concerto')">Concerto</button>
-    <button onclick="mostraModalita('distesa')">Distesa</button>
-    <button onclick="mostraModalita('martelli')">Martelli</button>
-  </div>
+  <header>
+    <div class="logo">RCTouchBell</div>
+    <div class="orario" id="orologio">--:--:--</div>
+    <div class="data" id="data">--/--/----</div>
+  </header>
 
-  <!-- Modalità Concerto -->
-  <div id="concerto" class="modalita">
-    <h2>Modalità Concerto</h2>
-    <div class="campana">
-      <button onclick="document.getElementById('campana1').play()">Campana 1</button>
-      <audio id="campana1" src="audio/concerto/campana1.mp3"></audio>
-    </div>
-    <div class="campana">
-      <button onclick="document.getElementById('campana2').play()">Campana 2</button>
-      <audio id="campana2" src="audio/concerto/campana2.mp3"></audio>
-    </div>
-  </div>
-
-  <!-- Modalità Distesa -->
-  <div id="distesa" class="modalita">
-    <h2>Modalità Distesa</h2>
-    <div class="campana">
-      <button onclick="document.getElementById('distesa1').play()">Distesa 1</button>
-      <audio id="distesa1" src="audio/distesa/distesa1.mp3"></audio>
-    </div>
-    <div class="campana">
-      <button onclick="document.getElementById('distesa2').play()">Distesa 2</button>
-      <audio id="distesa2" src="audio/distesa/distesa2.mp3"></audio>
+  <div class="sezione">
+    <h2>Campane a Distesa</h2>
+    <div class="icone" id="distesa">
+      <div class="campana" data-num="1"></div>
+      <div class="campana" data-num="2"></div>
+      <div class="campana" data-num="3"></div>
+      <div class="campana" data-num="4"></div>
+      <div class="campana" data-num="5"></div>
+      <div class="campana" data-num="6"></div>
+      <div class="campana" data-num="7"></div>
+      <div class="campana" data-num="8"></div>
     </div>
   </div>
 
-  <!-- Modalità Martelli -->
-  <div id="martelli" class="modalita">
-    <h2>Modalità Martelli</h2>
-    <div class="campana">
-      <button onclick="document.getElementById('martello1').play()">Martello 1</button>
-      <audio id="martello1" src="audio/martelli/martello1.mp3"></audio>
-    </div>
-    <div class="campana">
-      <button onclick="document.getElementById('martello2').play()">Martello 2</button>
-      <audio id="martello2" src="audio/martelli/martello2.mp3"></audio>
+  <div class="sezione">
+    <h2>Campane a Concerto</h2>
+    <div class="icone" id="concerto">
+      <div class="campana-verde" data-num="1"></div>
+      <div class="campana-verde" data-num="2"></div>
+      <div class="campana-verde" data-num="3"></div>
+      <div class="campana-verde" data-num="4"></div>
+      <div class="campana-verde" data-num="5"></div>
+      <div class="campana-verde" data-num="6"></div>
+      <div class="campana-verde" data-num="7"></div>
+      <div class="campana-verde" data-num="8"></div>
     </div>
   </div>
 
-  <!-- Importa suonate -->
-  <div id="importa">
-    <h2>Importa Suonate da Altro Simulatore</h2>
-    <input type="file" id="fileInput" accept=".json,.txt" onchange="leggiFile(event)">
-    <pre id="contenutoFile"></pre>
+  <div class="sezione">
+    <h2>Martelli</h2>
+    <div class="icone" id="martelli">
+      <div class="martello" data-num="1"></div>
+      <div class="martello" data-num="2"></div>
+      <div class="martello" data-num="3"></div>
+      <div class="martello" data-num="4"></div>
+      <div class="martello" data-num="5"></div>
+      <div class="martello" data-num="6"></div>
+      <div class="martello" data-num="7"></div>
+      <div class="martello" data-num="8"></div>
+    </div>
+  </div>
+
+  <button class="registra">REGISTRA</button>
+
+  <div class="barra-inferiore">
+    <button onclick="location.href='elenco.html'">ELENCO SUONI</button>
+    <button class="active" onclick="location.href='manuale.html'">SUONO MANUALE</button>
+    <button onclick="location.href='programmazione.html'">PROGRAMMAZIONE</button>
+    <button onclick="location.href='battito.html'">BATTITO ORE</button>
   </div>
 
   <script>
-    function mostraModalita(nome) {
-      const sezioni = document.querySelectorAll('.modalita');
-      sezioni.forEach(s => s.style.display = 'none');
-      document.getElementById(nome).style.display = 'block';
+    function aggiornaOrologio() {
+      const ora = new Date();
+      const hh = String(ora.getHours()).padStart(2, '0');
+      const mm = String(ora.getMinutes()).padStart(2, '0');
+      const ss = String(ora.getSeconds()).padStart(2, '0');
+      document.getElementById('orologio').textContent = `${hh}:${mm}:${ss}`;
+
+      const giorno = String(ora.getDate()).padStart(2, '0');
+      const mese = String(ora.getMonth() + 1).padStart(2, '0');
+      const anno = ora.getFullYear();
+      document.getElementById('data').textContent = `${giorno}/${mese}/${anno}`;
     }
 
-    function leggiFile(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+    setInterval(aggiornaOrologio, 1000);
+    aggiornaOrologio();
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        document.getElementById('contenutoFile').textContent = e.target.result;
-      };
-      reader.readAsText(file);
+    let suonataCorrente = [];
+
+    function registraClick(tipo, numero, elemento) {
+      suonataCorrente.push({ tipo, numero });
+      elemento.style.backgroundColor = '#ffd700';
+      setTimeout(() => {
+        elemento.style.backgroundColor = '';
+      }, 300);
     }
-  </script>
-</body>
-</html>
+
+    document.querySelectorAll('.campana').forEach(el => {
+      el.addEventListener('click', () => {
+        registraClick('distesa', el.dataset.num, el);
+      });
+    });
+
+    document.querySelectorAll('.campana-verde').forEach(el => {
+      el.addEventListener('click', () => {
+        registraClick('concerto', el.dataset.num, el);
+      });
+    });
+
+    document.querySelectorAll('.martello').forEach(el => {
+      el.addEventListener('click', () => {
+        registraClick('martello', el.dataset.num, el);
+      });
+    });
+
+    document.querySelector('.registra').addEventListener('click', () => {
+      if (suonataCorrente.length === 0) {
+        alert("Nessuna suonata registrata.");
+        return;
+      }
+
+      const nome = prompt("Inserisci il nome della suonata:");
+      if (nome) {
+        let elenco = JSON.parse(localStorage.getItem('suonate')) || [];
+        elenco.push({ nome, dati: suonataCorrente });
+        localStorage.setItem('suonate', JSON.stringify(elenco));
+        alert(`Suonata "${nome}" salvata con successo!`);
+        suonataCorrente = [];
+      }
+    });
+
+    window.addEventListener('load', () => {
+      const suonata = JSON.parse(localStorage.getItem('suonataDaRiprodurre'));
+      if (suonata) {
+        riproduciSuonata(suonata.dati);
+        localStorage.removeItem('suonataDaRiprodurre');
+      }
+    });
+
+    function riproduciSuonata(dati) {
+      let delay = 0;
+      dati.forEach(passaggio => {
+        setTimeout(() => {
+          let selettore = '';
+          if (passaggio.tipo === 'distesa') selettore = '.campana';
+          else if (passaggio.tipo === 'concerto') sele
 
