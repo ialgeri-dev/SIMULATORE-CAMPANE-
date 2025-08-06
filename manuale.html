@@ -449,6 +449,173 @@
     function renderElenco() {
       const container = document.getElementById('elenco-suoni');
       const su
+      // Elenco suoni
+    function renderElenco() {
+      const container = document.getElementById('elenco-suoni');
+      const suonate = JSON.parse(localStorage.getItem('suonate')) || [];
+      container.innerHTML = '';
+
+      suonate.forEach((suonata, index) => {
+        const div = document.createElement('div');
+        div.className = 'suonata';
+
+        const titolo = document.createElement('h3');
+        titolo.textContent = suonata.nome;
+        div.appendChild(titolo);
+
+        const azioni = document.createElement('div');
+        azioni.className = 'azioni';
+
+        const btnRinomina = document.createElement('button');
+        btnRinomina.className = 'rinomina';
+        btnRinomina.textContent = 'Rinomina';
+        btnRinomina.onclick = () => {
+          const nuovoNome = prompt("Nuovo nome:", suonata.nome);
+          if (nuovoNome) {
+            suonate[index].nome = nuovoNome;
+            localStorage.setItem('suonate', JSON.stringify(suonate));
+            renderElenco();
+          }
+        };
+
+        const btnElimina = document.createElement('button');
+        btnElimina.className = 'elimina';
+        btnElimina.textContent = 'Elimina';
+        btnElimina.onclick = () => {
+          if (confirm(`Eliminare la suonata "${suonata.nome}"?`)) {
+            suonate.splice(index, 1);
+            localStorage.setItem('suonate', JSON.stringify(suonate));
+            renderElenco();
+          }
+        };
+
+        const btnRiproduci = document.createElement('button');
+        btnRiproduci.textContent = 'Riproduci';
+        btnRiproduci.onclick = () => {
+          riproduciSuonata(suonata.dati);
+        };
+
+        azioni.appendChild(btnRinomina);
+        azioni.appendChild(btnElimina);
+        azioni.appendChild(btnRiproduci);
+        div.appendChild(azioni);
+
+        container.appendChild(div);
+      });
+    }
+
+    // Programmazione
+    let eventi = JSON.parse(localStorage.getItem('programmazioni')) || [];
+
+    function salvaEventi() {
+      localStorage.setItem('programmazioni', JSON.stringify(eventi));
+    }
+
+    function renderEventi() {
+      const elencoDiv = document.getElementById('elenco-eventi');
+      elencoDiv.innerHTML = '';
+      eventi.forEach((evento, index) => {
+        const div = document.createElement('div');
+        div.className = 'evento';
+
+        const titolo = document.createElement('h3');
+        titolo.textContent = `${evento.nome || evento.tipo} - ${evento.giorno} alle ${evento.ora}`;
+        div.appendChild(titolo);
+
+        const dettagli = document.createElement('p');
+        dettagli.textContent = `Campana ${evento.campana}`;
+        div.appendChild(dettagli);
+
+        const azioni = document.createElement('div');
+        azioni.className = 'azioni';
+
+        const btnRinomina = document.createElement('button');
+        btnRinomina.className = 'rinomina';
+        btnRinomina.textContent = 'Rinomina';
+        btnRinomina.onclick = () => {
+          const nuovoNome = prompt("Nuovo nome per l'evento:", evento.nome || evento.tipo);
+          if (nuovoNome) {
+            eventi[index].nome = nuovoNome;
+            salvaEventi();
+            renderEventi();
+          }
+        };
+
+        const btnElimina = document.createElement('button');
+        btnElimina.className = 'elimina';
+        btnElimina.textContent = 'Elimina';
+        btnElimina.onclick = () => {
+          if (confirm("Eliminare questa programmazione?")) {
+            eventi.splice(index, 1);
+            salvaEventi();
+            renderEventi();
+          }
+        };
+
+        azioni.appendChild(btnRinomina);
+        azioni.appendChild(btnElimina);
+        div.appendChild(azioni);
+
+        elencoDiv.appendChild(div);
+      });
+    }
+
+    document.querySelector('.aggiungi').addEventListener('click', () => {
+      const giorno = document.getElementById('giorno').value;
+      const ora = document.getElementById('ora').value;
+      const tipo = document.getElementById('tipo').value;
+      const campana = document.getElementById('campanaProg').value;
+
+      if (!ora) {
+        alert("Inserisci un'ora valida.");
+        return;
+      }
+
+      eventi.push({ giorno, ora, tipo, campana });
+      salvaEventi();
+      renderEventi();
+    });
+
+    // Battito ore
+    function salvaImpostazioni() {
+      const campana = document.getElementById('campanaBattito').value;
+      const oraInizio = parseInt(document.getElementById('oraInizio').value);
+      const oraFine = parseInt(document.getElementById('oraFine').value);
+
+      if (isNaN(oraInizio) || isNaN(oraFine)) {
+        alert("Inserisci ore valide.");
+        return;
+      }
+
+      const impostazioni = {
+        campana,
+        esclusione: { dalle: oraInizio, alle: oraFine }
+      };
+
+      localStorage.setItem('battitoOre', JSON.stringify(impostazioni));
+      mostraConfigurazione();
+      alert("Impostazioni salvate.");
+    }
+
+    function mostraConfigurazione() {
+      const dati = JSON.parse(localStorage.getItem('battitoOre'));
+      const configurazioneDiv = document.getElementById('configurazione');
+      if (dati) {
+        configurazioneDiv.innerHTML = `
+          <p><strong>Campana selezionata:</strong> Campana ${dati.campana}</p>
+          <p><strong>Esclusione oraria:</strong> dalle ${dati.esclusione.dalle}:00 alle ${dati.esclusione.alle}:00</p>
+        `;
+      } else {
+        configurazioneDiv.textContent = "Nessuna impostazione salvata.";
+      }
+    }
+
+    document.querySelector('.salva').addEventListener('click', salvaImpostazioni);
+  </script>
+</body>
+</html>
+
+
 
 
 
