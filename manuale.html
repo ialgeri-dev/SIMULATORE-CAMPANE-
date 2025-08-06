@@ -1,3 +1,81 @@
+<!-- Schermata iniziale con tastierino -->
+<div id="schermata-accesso">
+  <h2 style="text-align:center;">Inserisci il codice</h2>
+  <div id="display-codice" style="text-align:center; font-size:24px; margin-bottom:20px;">____</div>
+  <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px; max-width:200px; margin:0 auto;">
+    <button class="tasto" onclick="inserisciNumero('1')">1</button>
+    <button class="tasto" onclick="inserisciNumero('2')">2</button>
+    <button class="tasto" onclick="inserisciNumero('3')">3</button>
+    <button class="tasto" onclick="inserisciNumero('4')">4</button>
+    <button class="tasto" onclick="inserisciNumero('5')">5</button>
+    <button class="tasto" onclick="inserisciNumero('6')">6</button>
+    <button class="tasto" onclick="inserisciNumero('7')">7</button>
+    <button class="tasto" onclick="inserisciNumero('8')">8</button>
+    <button class="tasto" onclick="inserisciNumero('9')">9</button>
+    <button class="tasto" onclick="cancellaCodice()">←</button>
+    <button class="tasto" onclick="inserisciNumero('0')">0</button>
+    <button class="tasto" onclick="verificaCodice()">OK</button>
+  </div>
+</div>
+
+<style>
+  #schermata-accesso {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: #f2f2f2;
+    z-index: 9999;
+    padding-top: 100px;
+  }
+
+  .tasto {
+    width: 60px;
+    height: 60px;
+    font-size: 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #0078d7;
+    color: white;
+    cursor: pointer;
+  }
+
+  .tasto:hover {
+    background-color: #005fa3;
+  }
+</style>
+
+<script>
+  let codiceInserito = "";
+
+  function inserisciNumero(num) {
+    if (codiceInserito.length < 4) {
+      codiceInserito += num;
+      aggiornaDisplay();
+    }
+  }
+
+  function cancellaCodice() {
+    codiceInserito = codiceInserito.slice(0, -1);
+    aggiornaDisplay();
+  }
+
+  function aggiornaDisplay() {
+    const display = document.getElementById('display-codice');
+    display.textContent = codiceInserito.padEnd(4, '_');
+  }
+
+  function verificaCodice() {
+    if (codiceInserito === "1111") {
+      document.getElementById('schermata-accesso').style.display = 'none';
+      mostraSezione('manuale');
+    } else {
+      alert("Codice errato.");
+      codiceInserito = "";
+      aggiornaDisplay();
+    }
+  }
+</script>
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -613,7 +691,71 @@
     document.querySelector('.salva').addEventListener('click', salvaImpostazioni);
   </script>
 </body>
-</html>
+</html> // Battito ore automatico
+setInterval(() => {
+  const ora = new Date();
+  const minuti = ora.getMinutes();
+  const secondi = ora.getSeconds();
+
+  if (minuti === 0 && secondi === 0) {
+    const impostazioni = JSON.parse(localStorage.getItem('battitoOre'));
+    if (impostazioni) {
+      const oraAttuale = ora.getHours();
+      const { dalle, alle } = impostazioni.esclusione;
+      const escluso = dalle < alle
+        ? oraAttuale >= dalle && oraAttuale < alle
+        : oraAttuale >= dalle || oraAttuale < alle;
+
+      if (!escluso) {
+        const battiti = oraAttuale === 0 ? 12 : oraAttuale;
+        for (let i = 0; i < battiti; i++) {
+          setTimeout(() => {
+            evidenziaBattito(impostazioni.campana);
+          }, i * 1000);
+        }
+      }
+    }
+  }
+}, 1000);
+
+function evidenziaBattito(num) {
+  const campana = document.querySelector(`.campana[data-num="${num}"]`);
+  if (campana) {
+    campana.style.backgroundColor = '#ff6666';
+    setTimeout(() => {
+      campana.style.backgroundColor = '';
+    }, 300);
+  }
+}
+
+// Programmazione automatica
+setInterval(() => {
+  const ora = new Date();
+  const hhmm = `${String(ora.getHours()).padStart(2, '0')}:${String(ora.getMinutes()).padStart(2, '0')}`;
+  const giornoSettimana = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"][ora.getDay()];
+  const eventi = JSON.parse(localStorage.getItem('programmazioni')) || [];
+
+  eventi.forEach(evento => {
+    if (evento.giorno === giornoSettimana && evento.ora === hhmm) {
+      evidenziaProgrammazione(evento.tipo, evento.campana);
+    }
+  });
+}, 60000);
+
+function evidenziaProgrammazione(tipo, num) {
+  let selettore = tipo === 'distesa' ? '.campana'
+                 : tipo === 'concerto' ? '.campana-verde'
+                 : '.martello';
+
+  const campana = document.querySelector(`${selettore}[data-num="${num}"]`);
+  if (campana) {
+    campana.style.backgroundColor = '#66ccff';
+    setTimeout(() => {
+      campana.style.backgroundColor = '';
+    }, 500);
+  }
+}
+
 
 
 
